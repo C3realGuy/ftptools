@@ -6,8 +6,10 @@ var ftpIdent = require('../lib/ftpIdent.js');
 var ftpServer = require('./lib/server.js');
 var options = ftpServer.options;
 
-describe('ftpIdent', function() {
+describe('ftpIdent-plaintext', function() {
     before(function(done) {
+        ftpServer.options.tls = null;
+        ftpServer.options.tlsOnly = false;
         var _server = ftpServer.makeServer();
         _server.listen(options.port);
         setTimeout(done, 1000);
@@ -103,5 +105,13 @@ describe('ftpIdent', function() {
                  {canMkdir: '550 No permission'}});
             done();
         });
+    });
+});
+
+describe('ftpIdent-tls', function() {
+    before(function(done) {
+        var _server = ftpServer.makeServer();
+        _server.listen(options.port);
+        setTimeout(done, 1000);
     });
 });

@@ -36,28 +36,40 @@ var options = {
     useList: true,
     cwd: '/',
     root: Path.join(__dirname, '../ftphome'),
-    tls: null,
+    getInitialCwd: function() {
+        return options.cwd;
+    },
+    getRoot: function() {
+        return options.root;
+    },
+    pasvPortRangeStart: 1025,
+    pasvPortRangeEnd: 1050,
+    allowUnauthorizedTls: true,
+    tls: {
+        key: fs.readFileSync('./test/key.pem'),
+        cert: fs.readFileSync('./test/cert.pem'),
+        ca: !process.env.CA_FILES ? null : process.env.CA_FILES
+          .split(':')
+          .map(function(f) {
+              return fs.readFileSync(f);
+          }
+        ),
+    },
+    tlsOnly: false,
+    useWriteFile: false,
+    useReadFile: false,
+    uploadMaxSlurpSize: 7000, // N/A unless 'useWriteFile' is true.
+    debug: 0,
 };
+
+options.tls = null;
 
 function makeServer() {
     console.log('Making FTP Server...');
     console.log('Cleaning root...');
     fs.emptyDir(options.root);
-    var server = new ftpd.FtpServer(options.host, {
-        getInitialCwd: function() {
-            return options.cwd;
-        },
-        getRoot: function() {
-            return options.root;
-        },
-        pasvPortRangeStart: 1025,
-        pasvPortRangeEnd: 1050,
-        tlsOptions: options.tls,
-        allowUnauthorizedTls: false,
-        useWriteFile: false,
-        useReadFile: false,
-        uploadMaxSlurpSize: 7000, // N/A unless 'useWriteFile' is true.
-    });
+    var server = new ftpd.FtpServer(options.host, options);
+    server.debugging = options.debug;
 
     server.on('error', function(error) {
         console.log('FTP Server error:', error);

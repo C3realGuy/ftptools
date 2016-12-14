@@ -4,7 +4,9 @@
   "description": "",
   "main": "ftpIdent.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint * || true",
+    "ftpd": "node ./test/bin/startserver.js || true"
   },
   "author": "",
   "license": "ISC",
